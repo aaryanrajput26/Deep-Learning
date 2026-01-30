@@ -64,7 +64,69 @@ Memory-efficient in-place operations
 
 Risks with autograd in PyTorch
 
+# EXPERIMENT 2
+Experiment 2: Neural Network from Scratch using NumPy on MNIST Dataset
+📌 Objective
 
+To design and implement a feedforward neural network from scratch using NumPy (without using deep learning libraries such as TensorFlow or PyTorch) and train it on the MNIST handwritten digit dataset for digit classification.
+
+📊 Dataset Description
+
+The MNIST dataset consists of grayscale images of handwritten digits (0–9).
+
+Image size: 28 × 28 pixels
+
+Training samples: 60,000
+
+Test samples: 10,000
+
+Number of classes: 10
+
+Each image is flattened into a 784-dimensional vector before being fed into the neural network.
+
+🧠 Neural Network Architecture
+
+The implemented neural network follows a fully connected feedforward architecture:
+
+Layer	Description
+Input Layer	784 neurons (28×28 pixels)
+Hidden Layer	128 neurons
+Output Layer	10 neurons (digits 0–9)
+Activation Functions
+
+ReLU – used in the hidden layer
+
+Softmax – used in the output layer for multi-class classification
+
+⚙️ Methodology
+
+Load MNIST dataset from local IDX files
+
+Normalize pixel values to range [0, 1]
+
+One-hot encode class labels
+
+Initialize weights and biases
+
+Perform forward propagation
+
+Compute classification error
+
+Apply backpropagation to update parameters
+
+Evaluate accuracy on test dataset after each epoch
+
+🧮 Loss Function
+
+Categorical Cross-Entropy Loss (implicitly optimized using softmax gradient)
+
+📈 Results
+
+Final Test Accuracy: ~92% – 94%
+
+Training performed using mini-batch gradient descent
+
+Stable convergence achieved within 20 epochs
 # EXPERIMENT 3
 
 Experiment 3: Neural Network for Linear and Non-Linear Classification (From Scratch using NumPy)
