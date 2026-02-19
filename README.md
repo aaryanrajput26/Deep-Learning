@@ -214,3 +214,213 @@ Dataset Type	Model Used	Accuracy	Observation
 Linear	Perceptron	~100%	Successfully classified
 Non-Linear	Perceptron	~50–60%	Failed to learn
 Non-Linear	Multi-Layer NN	~90%+	Successfully classified
+
+
+
+# Experiment 6
+
+
+A deep learning project implementing **Seq2Seq machine translation** from English to Spanish using LSTM-based encoder-decoder architectures with and without attention mechanisms.
+
+---
+
+## 📌 Table of Contents
+- [Overview](#overview)
+- [Models Implemented](#models-implemented)
+- [Dataset](#dataset)
+- [Project Structure](#project-structure)
+- [Setup & Usage](#setup--usage)
+- [Results](#results)
+- [Attention Visualizations](#attention-visualizations)
+- [Requirements](#requirements)
+
+---
+
+## Overview
+
+This project explores three progressively advanced architectures for neural machine translation:
+
+1. A **vanilla LSTM Encoder-Decoder** that compresses the entire source sentence into a fixed context vector
+2. An **LSTM + Bahdanau (Additive) Attention** model that dynamically attends to relevant source words at each decoding step
+3. An **LSTM + Luong (Multiplicative) Attention** model using a simpler but effective dot-product alignment score
+
+All models are trained with **teacher forcing** and evaluated using the **BLEU score** metric. Attention weight heatmaps are generated to interpret model behavior.
+
+---
+
+## Models Implemented
+
+### 1. LSTM Encoder-Decoder (No Attention)
+- Multi-layer LSTM encoder reads the source sentence and produces a fixed context vector (final hidden + cell states)
+- Multi-layer LSTM decoder generates target tokens one at a time conditioned on the context vector
+- Teacher forcing applied during training with a 50% ratio
+
+### 2. Bahdanau (Additive) Attention
+- At each decoding step, computes alignment scores between the decoder hidden state and **all** encoder outputs
+- Score formula: `score = Vᵀ · tanh(W₁·hₜ + W₂·h̄ₛ)`
+- Context vector is a weighted sum of encoder outputs, allowing the model to focus on relevant source words
+
+### 3. Luong (Multiplicative) Attention
+- Simpler attention using a learned dot product between decoder state and encoder outputs
+- Score formula: `score = hₜᵀ · Wₐ · h̄ₛ`
+- Computationally lighter while achieving comparable or better results
+
+---
+
+## Dataset
+
+The project uses the **English-Spanish sentence pairs** dataset (tab-separated `.txt` file).
+
+```
+Hello.        Hola.
+How are you?  ¿Cómo estás?
+I am fine.    Estoy bien.
+```
+
+| Split | Size |
+|-------|------|
+| Train | 80%  |
+| Validation | 10% |
+| Test  | 10%  |
+
+**Recommended sample size:** 50,000 pairs for a good balance of BLEU score and training time.
+
+> 📥 Dataset source: [ManyThings.org Bilingual Sentence Pairs](https://www.manythings.org/anki/) — download `spa-eng.zip`
+
+---
+
+## Project Structure
+
+```
+📦 seq2seq-translation/
+├── 📓 seq2seq_translation.ipynb   # Main Colab notebook (all code)
+├── 📄 README.md                   # This file
+├── 📊 loss_comparison.png         # Training/validation loss curves
+├── 📊 bleu_comparison.png         # BLEU score bar chart
+├── 🖼️  attention_Bahdanau.png     # Bahdanau attention heatmap
+├── 🖼️  attention_Luong.png        # Luong attention heatmap
+└── 📁 models/                     # Saved model weights (after training)
+    ├── model_no_attention.pt
+    ├── model_bahdanau.pt
+    └── model_luong.pt
+```
+
+---
+
+## Setup & Usage
+
+### ▶️ Run in Google Colab (Recommended)
+
+1. Upload `seq2seq_translation.ipynb` to [Google Colab](https://colab.research.google.com/)
+2. Upload your dataset (`spa.txt`) to Google Drive
+3. Set the runtime to **GPU**: `Runtime > Change runtime type > T4 GPU`
+4. In **Section 1** of the notebook, update the dataset path:
+   ```python
+   DATA_PATH   = '/content/drive/MyDrive/spa.txt'
+   MAX_SAMPLES = 50000  # or None for full dataset
+   ```
+5. Run all cells: `Runtime > Run all`
+
+---
+
+### 💻 Run Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/seq2seq-translation.git
+cd seq2seq-translation
+
+# Install dependencies
+pip install torch sacrebleu nltk scikit-learn matplotlib numpy
+
+# Launch Jupyter
+jupyter notebook seq2seq_translation.ipynb
+```
+
+---
+
+## Results
+
+> Results below are indicative. Your scores may vary based on dataset size, epochs, and hardware.
+
+| Model | BLEU Score | Val Loss |
+|-------|-----------|----------|
+| LSTM (No Attention) | ~8–12 | — |
+| Bahdanau Attention  | ~18–25 | — |
+| Luong Attention     | ~17–24 | — |
+
+**Key Observations:**
+- Both attention models significantly outperform the vanilla baseline
+- Bahdanau and Luong produce comparable scores; Luong is slightly faster to train
+- BLEU improves substantially when trained on 50k+ sentence pairs vs 10k
+
+### Training Curves
+![Loss Comparison](loss_comparison.png)
+
+### BLEU Score Comparison
+![BLEU Comparison](bleu_comparison.png)
+
+---
+
+## Attention Visualizations
+
+Attention heatmaps show which source (English) words the model focuses on when generating each target (Spanish) word. Brighter cells = higher attention weight.
+
+**Example — Bahdanau Attention:**
+
+![Bahdanau Attention](attention_Bahdanau.png)
+
+**Example — Luong Attention:**
+
+![Luong Attention](attention_Luong.png)
+
+---
+
+## Requirements
+
+| Library | Version |
+|---------|---------|
+| Python  | 3.8+    |
+| PyTorch | 2.0+    |
+| sacrebleu | 2.0+ |
+| nltk    | 3.8+    |
+| scikit-learn | 1.0+ |
+| matplotlib | 3.5+ |
+| numpy   | 1.21+   |
+
+Install all at once:
+```bash
+pip install torch sacrebleu nltk scikit-learn matplotlib numpy
+```
+
+---
+
+## Hyperparameters
+
+| Parameter | Value |
+|-----------|-------|
+| Embedding Dim | 256 |
+| Hidden Dim | 512 |
+| LSTM Layers | 2 |
+| Dropout | 0.5 |
+| Batch Size | 64 |
+| Learning Rate | 0.001 |
+| Epochs | 20 |
+| Teacher Forcing Ratio | 0.5 |
+| Optimizer | Adam |
+
+---
+
+## Acknowledgements
+
+- Dataset: [ManyThings.org](https://www.manythings.org/anki/)
+- Attention mechanisms based on:
+  - [Bahdanau et al., 2015 — "Neural Machine Translation by Jointly Learning to Align and Translate"](https://arxiv.org/abs/1409.0473)
+  - [Luong et al., 2015 — "Effective Approaches to Attention-based Neural Machine Translation"](https://arxiv.org/abs/1508.04025)
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
